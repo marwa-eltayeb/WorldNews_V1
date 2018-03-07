@@ -52,6 +52,8 @@ public class LifestyleFragment extends Fragment implements LoaderManager.LoaderC
      */
     private ProgressBar loadingIndicator;
 
+    NetworkInfo networkInfo;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -83,7 +85,10 @@ public class LifestyleFragment extends Fragment implements LoaderManager.LoaderC
                 News currentNewsStory = adapter.getItem(position);
 
                 // Convert the String URL into a URI object (to pass into the Intent constructor).
-                Uri newsUri = Uri.parse(currentNewsStory.getWebUrl());
+                Uri newsUri = null;
+                if (currentNewsStory != null) {
+                    newsUri = Uri.parse(currentNewsStory.getWebUrl());
+                }
 
                 // Create a new intent to view the News's story URI.
                 Intent websiteIntent = new Intent(Intent.ACTION_VIEW, newsUri);
@@ -97,7 +102,7 @@ public class LifestyleFragment extends Fragment implements LoaderManager.LoaderC
         ConnectivityManager connMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
 
         // Get details on the currently active default data network
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        networkInfo = connMgr.getActiveNetworkInfo();
 
         if (networkInfo != null && networkInfo.isConnected()) {
             // Get a reference to the LoaderManager, in order to interact with loaders.
@@ -115,6 +120,7 @@ public class LifestyleFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public Loader<List<News>> onCreateLoader(int id, Bundle args) {
+        emptyStateTextView.setVisibility(View.INVISIBLE);
         // First, hide loading indicator.
         loadingIndicator.setVisibility(View.VISIBLE);
         // Create a new loader for the given URL.
@@ -123,18 +129,22 @@ public class LifestyleFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onLoadFinished(Loader<List<News>> loader, List<News> data) {
-        // Set empty state text to display "No news stories found."
-        emptyStateTextView.setText(R.string.no_news);
-        // Make it visible.
-        emptyStateTextView.setVisibility(View.VISIBLE);
-
         //Hide the indicator after the data is appeared
         loadingIndicator.setVisibility(View.GONE);
 
-        // If there is a valid list of news stories, then add them to the adapter's
-        // data set. This will trigger the ListView to update.
-        if (data != null && !data.isEmpty()) {
-            adapter.addAll(data);
+        // Check if connection is still available, otherwise show appropriate message
+        if (networkInfo != null && networkInfo.isConnected()) {
+            // If there is a valid list of news stories, then add them to the adapter's
+            // data set. This will trigger the ListView to update.
+            if (data != null && !data.isEmpty()) {
+                adapter.addAll(data);
+            }else {
+                emptyStateTextView.setVisibility(View.VISIBLE);
+                emptyStateTextView.setText(getString(R.string.no_news));
+            }
+
+        } else {
+            emptyStateTextView.setText(R.string.no_internet_connection);
         }
     }
 
