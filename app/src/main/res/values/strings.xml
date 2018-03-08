@@ -21,7 +21,7 @@
     <string name="description_of_the_news">Description of the news</string>
 
     <!-- Text to display in the list when there are no news stories appeared. -->
-    <string name="no_news">No news found.</string>
+    <string name="no_news">No news found. Kindly visit again to fetch the latest news.</string>
 
     <!-- Error message when there is no internet connectivity. -->
     <string name="no_internet_connection">No internet connection.</string>
