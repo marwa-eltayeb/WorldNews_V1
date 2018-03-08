@@ -20,4 +20,6 @@
     <dimen name="textSizeOfTab">17sp</dimen>
     <!-- Padding inside each Tab -->
     <dimen name="paddingOfTab">16dp</dimen>
+    <!-- Padding -->
+    <dimen name="myPadding">5dp</dimen>
 </resources>
